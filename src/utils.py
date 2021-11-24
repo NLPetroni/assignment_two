@@ -31,5 +31,3 @@ def download_data(data_path):
         with zipfile.ZipFile(toy_data_path) as loaded_zip:
             loaded_zip.extractall(data_path)
         print("Extraction completed!")
-
-download_data('dataset')
