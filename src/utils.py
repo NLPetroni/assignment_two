@@ -58,7 +58,7 @@ def add_oov(start_voc, oovs, embedding_matrix, sentences):
     context_words = [new_voc[word] 
                     for sentence in filter(lambda s: oov in s, sentences)
                     for word in sentence if word in new_voc and word not in (oov, '<PAD>')]
-    oov_embeddings[i] = np.mean(oov_embeddings[context_words])
+    oov_embeddings[start_voc_size + i] = np.mean(oov_embeddings[context_words], axis=0)
     new_voc[oov] = start_voc_size + i
   return new_voc, oov_embeddings
 
