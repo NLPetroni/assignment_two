@@ -1,7 +1,11 @@
 import os
 import requests
 import zipfile
+from zipfile import ZipFile
 import numpy as np
+from urllib.request import urlopen
+from io import BytesIO
+
 
 def save_response_content(response, destination):
     CHUNK_SIZE = 32768
@@ -11,6 +15,7 @@ def save_response_content(response, destination):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
 
+                
 def download_data(data_path):
     toy_data_path = os.path.join(data_path, 'fever_data.zip')
     toy_data_url_id = "1wArZhF9_SHW17WKNGeLmX-QTYw9Zscl1"
@@ -32,6 +37,7 @@ def download_data(data_path):
         with zipfile.ZipFile(toy_data_path) as loaded_zip:
             loaded_zip.extractall(data_path)
         print("Extraction completed!")
+        
         
 def add_oov(start_voc, oovs, embedding_matrix, sentences):
   """
@@ -56,3 +62,54 @@ def add_oov(start_voc, oovs, embedding_matrix, sentences):
     oov_embeddings[i] = np.mean(oov_embeddings[context_words])
     new_voc[oov] = start_voc_size + i
   return new_voc, oov_embeddings
+
+
+def get_glove(emb_size=100, number_token=False):
+  """
+    Download and load glove embeddings. 
+    Parameters:
+      emb_size: embedding size (50/100/200/300-dimensional vectors).    
+    Returns tuple (voc, emb) where voc is dict from words to idx (in emb) and emb is (numpy) embedding matrix
+  """
+  n_tokens = 400000 + 1 # glove vocabulary size + PAD
+  if emb_size not in (50, 100, 200, 300):
+    raise ValueError(f'wrong size parameter: {emb_size}')
+  
+  if number_token: 
+    n_tokens += 1
+  download_and_unzip('http://nlp.stanford.edu/data/glove.6B.zip', save_dir='glove')
+  vocabulary = dict()
+  embedding_matrix = np.ones((n_tokens, emb_size))
+
+  with open(f'glove/glove.6B.{emb_size}d.txt', encoding="utf8") as f:
+    for i, line in enumerate(f):
+        word, coefs = line.split(maxsplit=1)
+        coefs = np.fromstring(coefs, "f", sep=" ")
+        embedding_matrix[i] = coefs
+        vocabulary[word] = i
+  
+  # add embedding for and padding and number token
+  if number_token:
+    embedding_matrix[n_tokens - 2] = 0
+    vocabulary['<PAD>'] = n_tokens - 2
+    digits = list(filter(lambda s: re.fullmatch('\d+(\.\d*)?', s) is not None, vocabulary.keys()))
+    embedding_matrix[n_tokens - 1] = np.mean(embedding_matrix[[vocabulary[d] for d in digits]], axis=0)
+    vocabulary['<NUM>'] = n_tokens - 1
+  else: 
+    embedding_matrix[n_tokens - 1] = 0
+    vocabulary['<PAD>'] = n_tokens - 1
+  return vocabulary, embedding_matrix
+
+
+def download_and_unzip(url, save_dir='.'):
+  # downloads and unzips url, if not already downloaded
+  # used for downloading dataset and glove embeddings
+  fname = url.split('/')[-1][:-4] if save_dir == '.' else save_dir
+  if fname not in os.listdir():
+    print(f'downloading and unzipping {fname}...', end=' ')
+    r = urlopen(url)
+    zipf = ZipFile(BytesIO(r.read()))
+    zipf.extractall(path=save_dir)
+    print(f'completed')
+  else:
+    print(f'{fname} already downloaded')
