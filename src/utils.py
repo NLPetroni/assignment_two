@@ -1,7 +1,6 @@
 import os
 import requests
 import zipfile
-from zipfile import ZipFile
 import numpy as np
 from urllib.request import urlopen
 from io import BytesIO
@@ -108,7 +107,7 @@ def download_and_unzip(url, save_dir='.'):
   if fname not in os.listdir():
     print(f'downloading and unzipping {fname}...', end=' ')
     r = urlopen(url)
-    zipf = ZipFile(BytesIO(r.read()))
+    zipf = zipfile.ZipFile(BytesIO(r.read()))
     zipf.extractall(path=save_dir)
     print(f'completed')
   else:
