@@ -112,3 +112,8 @@ def download_and_unzip(url, save_dir='.'):
     print(f'completed')
   else:
     print(f'{fname} already downloaded')
+
+
+def get_wandbkey():
+    with open("res/wandb_key.txt", "r") as txt_file:
+        return txt_file.read()
