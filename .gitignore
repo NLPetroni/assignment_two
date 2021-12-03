@@ -1,2 +1,7 @@
 /res/embedding_matrix.npy
 /res/wandb_key.txt
+wandb/
+.idea/
+dataset
+glove/
+src/__pycache__/
