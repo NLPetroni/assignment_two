@@ -117,3 +117,38 @@ def download_and_unzip(url, save_dir='.'):
 def get_wandbkey():
     with open("res/wandb_key.txt", "r") as txt_file:
         return txt_file.read()
+
+
+def __pad_line(line,max_len):
+    """
+    Pads a single line to reache max_len
+    Args:
+        line: Line to pad
+        max_len: Length to reach
+
+    Returns:
+    Padded line
+    """
+    res = line.copy()
+    diff = max_len - len(line)
+    padding = ['<PAD>',] * diff
+    res = res + padding
+    return res
+
+
+def pad_data(data, max_len):
+    """
+    Pads every element in data to reach the max length
+    Args:
+        data: list of tokenized lines
+        max_len: max length to reach in every element
+
+    Returns: The padded data
+
+    """
+    res = []
+    for line in data:
+        l = __pad_line(line,max_len)
+        res.append(l)
+
+    return res
