@@ -115,8 +115,11 @@ def download_and_unzip(url, save_dir='.'):
 
 
 def get_wandbkey():
-    with open("res/wandb_key.txt", "r") as txt_file:
-        return txt_file.read()
+    if os.path.exists('res/wandb_key.txt'):
+        with open("res/wandb_key.txt", "r") as txt_file:
+            return txt_file.read()
+    else:
+        return input('wandb_key.txt is missing. Enter here your key:')
 
 
 def __pad_line(line,max_len):
