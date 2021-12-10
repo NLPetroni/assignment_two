@@ -119,7 +119,11 @@ def get_wandbkey():
         with open("res/wandb_key.txt", "r") as txt_file:
             return txt_file.read()
     else:
-        return input('wandb_key.txt is missing. Enter here your key:')
+        import getpass
+        key = getpass.getpass('wandb_key.txt is missing. Enter here your key:')
+        with open("res/wandb_key.txt", "w") as txt_file:
+            txt_file.write(key)
+        return key
 
 
 def __pad_line(line,max_len):
