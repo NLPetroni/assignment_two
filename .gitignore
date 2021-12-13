@@ -1,4 +1,3 @@
-/res/embedding_matrix.npy
 /res/wandb_key.txt
 wandb/
 .idea/
