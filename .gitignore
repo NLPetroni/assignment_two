@@ -1,4 +1,5 @@
 /res/wandb_key.txt
+/res/embedding_matrix.npy
 wandb/
 .idea/
 dataset
