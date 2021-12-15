@@ -5,6 +5,8 @@ import numpy as np
 from urllib.request import urlopen
 from io import BytesIO
 
+import torch
+
 
 def save_response_content(response, destination):
     CHUNK_SIZE = 32768
@@ -127,35 +129,27 @@ def get_wandbkey():
 
 
 def __pad_line(line, max_len):
-    """
-    Pads a single line to reache max_len
-    Args:
-        line: Line to pad
-        max_len: Length to reach
-
-    Returns:
-    Padded line
-    """
+    pad_token = 400000
     res = line.copy()
     diff = max_len - len(line)
-    padding = ['<PAD>', ] * diff
+    padding = [pad_token for _ in range(diff)]
     res = res + padding
     return res
 
 
-def pad_data(data, max_len):
+def pad_data(data):
     """
-    Pads every element in data to reach the max length
+    Pads and masks every element in data
     Args:
-        data: list of tokenized lines
-        max_len: max length to reach in every element
-
-    Returns: The padded data
-
+        data: list of tokenized sequences
+    Returns: a torch.Tensor containing padded and masked data
     """
-    res = []
+    data_lens = [len(d) for d in data]
+    max_len = max(data_lens)
+    padded_data = []
     for line in data:
         l = __pad_line(line, max_len)
-        res.append(l)
-
-    return res
+        padded_data.append(l)
+    padded_data = torch.as_tensor(padded_data)
+    padded_data = torch.nn.utils.rnn.pack_padded_sequence(padded_data, data_lens, batch_first=True, enforce_sorted=False)
+    return padded_data
