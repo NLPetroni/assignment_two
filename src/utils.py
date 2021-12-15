@@ -147,7 +147,7 @@ def pad_data(data):
         data_lengths: a list containing original lenghts of the vectors
     """
     data_lengths = [len(d) for d in data]
-    max_len = max(data_lens)
+    max_len = max(data_lengths)
     padded_data = []
     for line in data:
         l = __pad_line(line, max_len)
