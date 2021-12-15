@@ -142,14 +142,15 @@ def pad_data(data):
     Pads and masks every element in data
     Args:
         data: list of tokenized sequences
-    Returns: a torch.Tensor containing padded and masked data
+    Returns:
+        padded_data: a torch.Tensor containing padded data
+        data_lengths: a list containing original lenghts of the vectors
     """
-    data_lens = [len(d) for d in data]
+    data_lengths = [len(d) for d in data]
     max_len = max(data_lens)
     padded_data = []
     for line in data:
         l = __pad_line(line, max_len)
         padded_data.append(l)
     padded_data = torch.as_tensor(padded_data)
-    padded_data = torch.nn.utils.rnn.pack_padded_sequence(padded_data, data_lens, batch_first=True, enforce_sorted=False)
-    return padded_data
+    return padded_data, data_lengths
