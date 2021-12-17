@@ -7,6 +7,8 @@ from io import BytesIO
 
 import torch
 
+PAD_TOKEN = 400000
+
 
 def save_response_content(response, destination):
     CHUNK_SIZE = 32768
@@ -129,10 +131,9 @@ def get_wandbkey():
 
 
 def __pad_line(line, max_len):
-    pad_token = 400000
     res = line.copy()
     diff = max_len - len(line)
-    padding = [pad_token for _ in range(diff)]
+    padding = [PAD_TOKEN for _ in range(diff)]
     res = res + padding
     return res
 
